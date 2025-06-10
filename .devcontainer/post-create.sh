@@ -15,7 +15,16 @@ sudo apt-get update && sudo apt-get install -y git
 # Create Laravel project if it doesn't exist
 if [ ! -f "composer.json" ]; then
     echo "📦 Creating new Laravel project..."
-    composer create-project laravel/laravel . --prefer-dist --no-interaction
+    
+    # Create Laravel in a temporary directory
+    cd /tmp
+    composer create-project laravel/laravel laravel-temp --prefer-dist --no-interaction
+    
+    # Move Laravel files to workspace (excluding .git to preserve our repo)
+    cd laravel-temp
+    cp -r . /workspace/
+    cd /workspace
+    rm -rf /tmp/laravel-temp
     
     # Install Laravel Breeze with Vue
     composer require laravel/breeze --dev
@@ -29,7 +38,7 @@ fi
 sudo chown -R vscode:vscode /workspace
 chmod -R 755 /workspace
 
-# Copy environment file
+# Copy environment file if it doesn't exist
 if [ ! -f ".env" ]; then
     cp .env.example .env
 fi
@@ -42,7 +51,7 @@ sed -i 's/DB_PASSWORD=/DB_PASSWORD=laravel_password/' .env
 
 # Wait for MySQL to be ready
 echo "⏳ Waiting for MySQL to be ready..."
-while ! mysqladmin ping -h mysql -u laravel_user -plaravel_password --silent; do
+while ! mysqladmin ping -h mysql -u laravel_user -plaravel_password --silent 2>/dev/null; do
     sleep 1
 done
 
