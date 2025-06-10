@@ -4,11 +4,13 @@ set -e
 
 echo "🚀 Setting up Laravel + Vue development environment..."
 
-# Install Composer
-curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
+# Install Composer with proper permissions
+curl -sS https://getcomposer.org/installer | php -- --install-dir=/tmp --filename=composer
+sudo mv /tmp/composer /usr/local/bin/composer
+sudo chmod +x /usr/local/bin/composer
 
 # Install Git (should already be there, but just in case)
-apt-get update && apt-get install -y git
+sudo apt-get update && sudo apt-get install -y git
 
 # Create Laravel project if it doesn't exist
 if [ ! -f "composer.json" ]; then
@@ -24,7 +26,7 @@ if [ ! -f "composer.json" ]; then
 fi
 
 # Set proper permissions
-chown -R vscode:vscode /workspace
+sudo chown -R vscode:vscode /workspace
 chmod -R 755 /workspace
 
 # Copy environment file
